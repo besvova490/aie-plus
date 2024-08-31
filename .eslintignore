@@ -6,3 +6,4 @@ build/
 jest.config.js
 coverage/
 .babelrc
+public/

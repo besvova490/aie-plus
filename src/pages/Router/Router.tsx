@@ -9,7 +9,7 @@ const AuthLayout = lazy(() => import("../../layouts/AuthLayout"));
 const Home = lazy(() => import("../Home"));
 const LogIn = lazy(() => import("../LogIn"));
 
-const renderWithSuspense = (Component: React.LazyExoticComponent<() => JSX.Element>) => (
+const renderWithSuspense = (Component: React.LazyExoticComponent<() => React.JSX.Element>) => (
   <Suspense fallback="...">
     <Component />
   </Suspense>
