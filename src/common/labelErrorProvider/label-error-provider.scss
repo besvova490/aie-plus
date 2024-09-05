@@ -1,0 +1,33 @@
+.hdep-label-error-provider {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-content: flex-start;
+
+  grid-template-areas:
+  "label label"
+  "field field"
+  "error error";
+
+  &_left {
+    grid-template-areas:
+    "label field"
+    "error error";
+  }
+
+  &:not(&:has(.hdep-label-error-provider__label)) {
+    gap: 0;
+  }
+
+  &__label {
+    grid-area: label;
+  }
+
+  &__field {
+    grid-area: field;
+  }
+
+  &__error {
+    grid-area: error;
+  }
+}

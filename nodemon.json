@@ -1,4 +1,4 @@
 {
-  "watch": ["server/index.js", "server/"],
+  "watch": ["public/**/*.js"],
   "delay": "2500"
 }

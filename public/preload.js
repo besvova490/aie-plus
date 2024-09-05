@@ -7,8 +7,9 @@ const {
   UPDATE_PROGRESS_BAR,
   OPEN_FILE,
   FOCUS_MAIN_WINDOW,
-  NAVIGATE_TO
-} = require("./ipcEvents/ipcEventsKeys");
+  NAVIGATE_TO,
+  READ_XLSX
+} = require("./utils/ipcEvents/ipcEventsKeys");
 
 contextBridge.exposeInMainWorld("electronAPI", {
   getWebAppInfo: (payload) => ipcRenderer.send(GET_WEB_APP_INFO, payload),
@@ -16,6 +17,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   
   saveFile: (payload) => ipcRenderer.send(SAVE_FILE, payload),
   saveFileCallback: (payload) => ipcRenderer.on(SAVE_FILE, payload),
+
+  readXlsx: (payload) => ipcRenderer.send(READ_XLSX, payload),
+  readXlsxCallback: (payload) => ipcRenderer.on(READ_XLSX, payload),
 
   updateProgressBar: (payload) => ipcRenderer.send(UPDATE_PROGRESS_BAR, payload),
   openFile: (payload) => ipcRenderer.send(OPEN_FILE, payload),

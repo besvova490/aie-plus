@@ -1,16 +1,9 @@
 const fs = require("fs");
 
-const saveFile = ({ data, title }, app, callback) => {
-  // const fields = ["userId", "event", "country", "page", "isMobile", "browserInfo", "data"];
-  // const opts = { fields };
+const saveFile = ({ file, title, type }, app, callback) => {
+  const filePath = `${app.getPath("desktop")}/${title}.${type}`;
 
-  // const parser = new Parser(opts);
-  // const csv = parser.parse(data);
-  console.log(data);
-
-  const filePath = `${app.getPath("desktop")}/${title}.csv`;
-
-  fs.writeFile(filePath, csv, () => callback(filePath));
+  fs.writeFile(filePath, file, () => callback(filePath));
 };
 
 module.exports = {

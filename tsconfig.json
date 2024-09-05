@@ -20,9 +20,13 @@
     "downlevelIteration": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src"
+    "src",
+    "global.d.ts"
   ]
 }

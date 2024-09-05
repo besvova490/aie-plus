@@ -1,7 +1,7 @@
 import { useLocation, Link } from "react-router-dom";
 
 // assets
-import "../assets/styles/pages/home.scss";
+// import "../assets/styles/pages/home.scss";
 
 
 function Home() {

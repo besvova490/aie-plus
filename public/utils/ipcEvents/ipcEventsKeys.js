@@ -10,6 +10,8 @@ const OPEN_FILE = "OPEN_FILE";
 
 const NAVIGATE_TO = "NAVIGATE_TO";
 
+const READ_XLSX = "READ_XLSX";
+
 module.exports = {
   GET_WEB_APP_INFO,
   GET_WEB_APP_INFO_SUCCESS,
@@ -17,5 +19,6 @@ module.exports = {
   SAVE_FILE,
   OPEN_FILE,
   FOCUS_MAIN_WINDOW,
-  NAVIGATE_TO
+  NAVIGATE_TO,
+  READ_XLSX
 };
