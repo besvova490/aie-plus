@@ -29,27 +29,29 @@ const TABLE_COLUMNS = [
   { header: "За якою спеціальністю здійснюється або здійснювалась підготовка", key: "speciality" },
   { header: "За яким ВОС здійснюється або здійснювалась підготовка", key: "vos" },
   { header: "станом на сьогодні здійснюється підготовка", key: "today" },
-  { header: "І квартал", key: "firstQuarter" },
-  { header: "ІІ квартал", key: "secondQuarter" },
-  { header: "ІІІ квартал", key: "thirdQuarter" },
-  { header: "ІV квартал", key: "fourthQuarter" },
-  { header: "Всього за I - IV квартал", key: "total" }
+  { header: "І квартал\nсічень - березень\nпройшли підготовку", key: "firstQuarter" },
+  { header: "ІІ квартал\nквітень - червень\nпройшли підготовку", key: "secondQuarter" },
+  { header: "ІІІ квартал\nлипень - вересень\nпройшли підготовку", key: "thirdQuarter" },
+  { header: "ІV квартал\nжовтень - грудень\nпройшли підготовку", key: "fourthQuarter" },
+  { header: "Всього за I - IV квартал\nпройшли підготовку", key: "total" }
 ];
 
 const filterUsersByQuarter = (users: ISingleUser[], quarter: keyof typeof QUARTERS) => {
   return users.filter(user => dayjs(user.period.from).isBetween(QUARTERS[quarter].from, QUARTERS[quarter].to));
 }
 
+const ROW_OFFSET = 4;
+
 export const generateReport = async(dataSource: ISingleUser[]) => {
   const workbook = new exceljs.Workbook();
-  const worksheet = workbook.addWorksheet("Підготовка");
+  const worksheet = workbook.addWorksheet("Звіт про підготовку");
 
-  worksheet.getRow(3).values = TABLE_COLUMNS.map(column => column.header);
-  worksheet.getRow(3).eachCell((cel, index) => {
+  worksheet.getRow(ROW_OFFSET).values = TABLE_COLUMNS.map(column => column.header);
+  worksheet.getRow(ROW_OFFSET).eachCell((cell, index) => {
     if (index <= TABLE_COLUMNS.length) {
-      cel.border = HEADER_BORDER;
-      cel.font = { bold: true, size: 14 };
-      cel.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+      cell.border = HEADER_BORDER;
+      cell.font = { bold: true, size: 14 };
+      cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
     }
   })
 
@@ -70,20 +72,39 @@ export const generateReport = async(dataSource: ISingleUser[]) => {
       filterUsersByQuarter(users, "third").length,
       filterUsersByQuarter(users, "fourth").length,
       users.length,
-    ])
+    ]).eachCell((cell, cellIndex) => {
+      cell.border = { right: BORDER_STYLE, };
+      cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+      cell.font = { size: 14 };
+
+      if (cellIndex === 2) {
+        cell.alignment = { horizontal: "left", vertical: "middle", wrapText: true };
+      }
+    });
   });
 
   worksheet.addRow([
-    "Всього",
+    "Всього:",
     "",
     "",
-    { formula: `SUM(D4:D${Object.keys(groupedUsers).length + 3})` },
-    { formula: `SUM(E4:E${Object.keys(groupedUsers).length + 3})` },
-    { formula: `SUM(F4:F${Object.keys(groupedUsers).length + 3})` },
-    { formula: `SUM(G4:G${Object.keys(groupedUsers).length + 3})` },
-    { formula: `SUM(H4:H${Object.keys(groupedUsers).length + 3})` },
-    { formula: `SUM(I4:I${Object.keys(groupedUsers).length + 3})` },
-  ]).getCell(1).alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+    { formula: `SUM(D${ROW_OFFSET + 1}:D${Object.keys(groupedUsers).length + ROW_OFFSET})` },
+    { formula: `SUM(E${ROW_OFFSET + 1}:E${Object.keys(groupedUsers).length + ROW_OFFSET})` },
+    { formula: `SUM(F${ROW_OFFSET + 1}:F${Object.keys(groupedUsers).length + ROW_OFFSET})` },
+    { formula: `SUM(G${ROW_OFFSET + 1}:G${Object.keys(groupedUsers).length + ROW_OFFSET})` },
+    { formula: `SUM(H${ROW_OFFSET + 1}:H${Object.keys(groupedUsers).length + ROW_OFFSET})` },
+    { formula: `SUM(I${ROW_OFFSET + 1}:I${Object.keys(groupedUsers).length + ROW_OFFSET})` },
+  ]).eachCell((cell, index) => {
+    cell.border = HEADER_BORDER;
+    cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+    cell.font = { size: 14 };
+
+    if (index === 1) {
+      cell.font = { bold: true, size: 14 };
+    }
+  });
+
+  const lastRow = worksheet.lastRow?.number;
+  worksheet.mergeCells(`A${lastRow}`, `C${lastRow}`);
 
   // styles and formatting
   worksheet.columns.forEach((column) => {

@@ -23,9 +23,10 @@ interface IUseUsersList {
 export const TABLE_COLUMNS = [
   {
     title: "№ з/п",
-    dataIndex: "order",
+    dataIndex: "index",
     className: "whitespace-nowrap",
     sortBy: "number",
+    render: (_: unknown, __: unknown, index: number) => index + 1,
   },
   {
     title: "Підрозділ",
@@ -118,15 +119,17 @@ const getOptions = (data: ISingleUser[], dataIndex: string) => {
   ];
 }
 
-const filterDataSource = (data: ISingleUser[], search: string, params: Record<string, string | undefined>) => {
+export const filterDataSource = (data: ISingleUser[], search: string, params: Record<string, string | undefined>) => {
   const { from, to, ...restParams } = params || {};
 
   const filteredData = data
-    .filter(item => item.fullName.toLowerCase().includes(search.toLowerCase()))
+    .filter(item => !search || item.fullName?.toLowerCase().includes(search.toLowerCase()))
     .filter(
       item => Object.keys(restParams).every(key => params[key] ? item[key as keyof ISingleUser] === params[key] : true)
     )
-    .filter(item => from && to ? dayjs(item.period.from).isBetween(from, to) : true);
+    .filter(item => {
+      return from && to ? dayjs(item.period.from).isBetween(from, to) : true;
+    });
 
   return filteredData;
 }
@@ -166,10 +169,11 @@ export function useUsersList(args?: IUseUsersList) {
   const tableDataSource = (data || []).slice((+page - 1) * +pageSize, +page * +pageSize)
 
   return {
-    dataSource: filterDataSource(tableDataSource, search, restParams),
+    total: data?.length,
+    dataSource: filterDataSource(tableDataSource, search || "", restParams),
     options: TABLE_COLUMNS.filter(column => column.isSelectable).reduce((acc, column) => ({
       ...acc,
-      [column.dataIndex]: getOptions(data || [], column.dataIndex),
+      [column.dataIndex as string]: getOptions(data || [], column.dataIndex as string),
     }), {}),
     columns: columns.flat() as ITableColumn<ISingleUser>[],
     ...rest,

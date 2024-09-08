@@ -63,7 +63,7 @@ export function DatePicker(props: IDatePicker) {
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {date ? dayjs(date).format("DD MMMM YYYY") : <span>Pick a date</span>}
+            {date ? dayjs(date).format("DD MMMM YYYY") : <span>Виберіть Дату від/до</span>}
           </Button>
         </PopoverTrigger>
       </LabelErrorProvider>

@@ -1,11 +1,13 @@
 const xlsx = require('xlsx');
 
 const readXlsx = ({ data }, _, callback) => {
-  const workbook = xlsx.readFile(data, { type: 'buffer' });
-  const sheetName = workbook.SheetNames[0];
-  const sheet = workbook.Sheets[sheetName];
+  const sheets = data.map(buffer => {
+    const workbook = xlsx.readFile(buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    return workbook.Sheets[sheetName];
+  })
 
-  callback({ sheet });
+  callback({ sheets });
 }
 
 module.exports = {

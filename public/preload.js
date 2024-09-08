@@ -6,6 +6,7 @@ const {
   GET_WEB_APP_INFO, SAVE_FILE,
   UPDATE_PROGRESS_BAR,
   OPEN_FILE,
+  OPEN_PATH,
   FOCUS_MAIN_WINDOW,
   NAVIGATE_TO,
   READ_XLSX
@@ -23,8 +24,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   updateProgressBar: (payload) => ipcRenderer.send(UPDATE_PROGRESS_BAR, payload),
   openFile: (payload) => ipcRenderer.send(OPEN_FILE, payload),
-
-
+  openPath: (payload) => ipcRenderer.send(OPEN_PATH, payload),
   focusMainWindow: () => ipcRenderer.send(FOCUS_MAIN_WINDOW),
   navigateTo: (payload) => ipcRenderer.on(NAVIGATE_TO, payload),
 });

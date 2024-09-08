@@ -24,11 +24,7 @@ export const useQueryParams = <T = { [key: string]: string | undefined }>(custom
   };
 
   const clearQueryParams = () => {
-    params.forEach((_, key) => {
-      params.delete(key);
-    });
-
-    setSearch(params.toString());
+    setSearch({}.toString());
   }
 
   return [

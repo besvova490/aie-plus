@@ -10,6 +10,7 @@ const {
   UPDATE_PROGRESS_BAR,
   SAVE_FILE,
   OPEN_FILE,
+  OPEN_PATH,
   FOCUS_MAIN_WINDOW,
   READ_XLSX,
 } = require("./ipcEventsKeys");
@@ -32,7 +33,12 @@ module.exports = (app, win) => {
 
   ipcMain.on(
     OPEN_FILE,
-    (_, filepath) => shell.showItemInFolder(filepath)
+    (_, { path }) => shell.openPath(path)
+  );
+
+  ipcMain.on(
+    OPEN_PATH,
+    (_, { path }) => shell.showItemInFolder(path)
   );
 
   ipcMain.on(

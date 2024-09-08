@@ -48,8 +48,8 @@ export const sheetToJson = (sheet: ISheet) => {
         return {
           ...acc,
           [column.dataIndex]: {
-            from: get(sheet, key),
-            to: get(sheet, toKey)
+            from: new Date(get(sheet, key) as unknown as string),
+            to: new Date(get(sheet, toKey) as unknown as string)
           }
         }
       }

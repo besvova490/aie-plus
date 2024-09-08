@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
@@ -40,6 +40,7 @@ interface DatePickerWithRangeProps extends Omit<React.HTMLAttributes<HTMLDivElem
   error?: string;
   fullWidth?: boolean;
   onChange?: (date: DateRange | undefined) => void;
+  value?: DateRange | null;
 }
 
 export function DatePickerWithRange({
@@ -48,8 +49,9 @@ export function DatePickerWithRange({
   error,
   fullWidth,
   onChange,
+  value,
 }: DatePickerWithRangeProps) {
-  const [date, setDate] = useState<DateRange | undefined>()
+  const [date, setDate] = useState<DateRange | undefined>();
 
   // methods
   const handleChange = (e: DateRange | undefined) => {
@@ -57,6 +59,12 @@ export function DatePickerWithRange({
     onChange?.(e);
   }
 
+  // effects
+  useEffect(() => {
+    setDate(value as DateRange);
+  }, [value]);
+
+  // renders
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>
@@ -95,7 +103,7 @@ export function DatePickerWithRange({
                   dayjs(date.from).format("DD.MM.YYYY")
                 )
               ) : (
-                <span>Pick a date</span>
+                <span>Виберіть Дату від/до</span>
               )}
             </Button>
           </PopoverTrigger>
@@ -122,7 +130,7 @@ export function DatePickerWithRange({
             <Button
               size="sm"
               variant={"outline"}
-              onClick={() => handleChange(undefined)}
+              onClick={() => handleChange({ from: undefined, to: undefined })}
             >
               Очистити
             </Button>

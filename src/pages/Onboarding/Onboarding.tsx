@@ -16,16 +16,16 @@ function Onboarding() {
   const navigate = useNavigate();
   
   // methods
-  const handleDrop = (acceptedFiles: File[]) => {
-    acceptedFiles[0].arrayBuffer().then(data => {
-      window.electronAPI.readXlsx({ data });
-    })
+  const handleDrop = async (acceptedFiles: File[]) => {
+    const data = await Promise.all(acceptedFiles.map(file => file.arrayBuffer()));
+    window.electronAPI.readXlsx({ data });
   }
 
   // effects
   useEffect(() => {
     window.electronAPI.readXlsxCallback((_, payload) => {
-      localStorage.setItem(SWR_KEYS.USERS_LIST, JSON.stringify(sheetToJson(payload.sheet)));
+      const sheets = payload.sheets.map(sheet => sheetToJson(sheet)).flat();
+      localStorage.setItem(SWR_KEYS.USERS_LIST, JSON.stringify(sheets));
       
       navigate(ROUTES.DASHBOARD.ROOT);
     });
@@ -43,9 +43,9 @@ function Onboarding() {
       >
         {
           ({ getRootProps, getInputProps }) => (
-            <div {...getRootProps()} className="flex flex-col items-center justify-center gap-6 min-w-[420px] min-h-[320px] w-3/5 border border-dashed rounded-lg bg-slate-700">
+            <div {...getRootProps()} className="flex flex-col items-center justify-center gap-6 min-w-[420px] min-h-[320px] w-3/5 border border-dashed rounded-lg bg-slate-100">
               <input {...getInputProps()} />
-              <p className="text-center text-lg text-slate-200">
+              <p className="text-center text-lg text-slate-900">
                 Перетягніть або натисніть, щоб завантажити файл
               </p>
               <Button>
