@@ -57,11 +57,26 @@ function Dashboard() {
   const handleDeleteUser = (userId: string) => {
     const usersList = localStorage.getItem(SWR_KEYS.USERS_LIST);
     const usersListData = usersList ? JSON.parse(usersList) : [];
-    const newUsersList = usersListData.filter((user: ISingleUser) => user.id !== userId);
+    const user = usersListData.find((item: ISingleUser) => item.id === userId);
+    const newUsersList = usersListData.filter((item: ISingleUser) => item.id !== userId);
 
     localStorage.setItem(SWR_KEYS.USERS_LIST, JSON.stringify(newUsersList));
     setModalsConfig(INIT_MODALS_CONFIG);
     mutate();
+
+    toast({
+      description: `Запис про ${user.fullName} видалено`,
+      variant: "destructive",
+    });
+  }
+
+  const handleEditUser = (user: ISingleUser) => {
+    setModalsConfig(INIT_MODALS_CONFIG);
+
+    toast({
+      description: `Запис про ${user.fullName} змінено`,
+      variant: "success",
+    });
   }
 
   const handleGenerateReport = () => {
@@ -69,7 +84,7 @@ function Dashboard() {
     const usersData = users ? JSON.parse(users) : [];
     
     generateReport(usersData).then(arrayBuffer => {
-      window.electronAPI.saveFile({ file: arrayBuffer, title: `Звіт про підготовку ${dayjs().format("DD-MM-YYYY HH:mm:ss")}`, type: "xlsx" });
+      window.electronAPI.saveFile({ file: arrayBuffer, title: `Звіт-про-підготовку_${dayjs().format("DD-MM-YYYY_HH:mm:ss")}`, type: "xlsx" });
     });
   }
 
@@ -78,7 +93,7 @@ function Dashboard() {
     const usersData = users ? JSON.parse(users) : [];
 
     exportTable(filterDataSource(usersData, params.search || "", params)).then(arrayBuffer => {
-      window.electronAPI.saveFile({ file: arrayBuffer, title: `Підготовка_${dayjs().format("DD-MM-YYYY HH:mm:ss")}`, type: "xlsx" });
+      window.electronAPI.saveFile({ file: arrayBuffer, title: `Підготовка_${dayjs().format("DD-MM-YYYY_HH:mm:ss")}`, type: "xlsx" });
     });
   }
 
@@ -216,15 +231,15 @@ function Dashboard() {
       <AddUserDialog
         open={modalsConfig.addUser.open}
         value={modalsConfig.addUser.value as ISingleUser}
-        onOpenChange={() => setModalsConfig({ ...modalsConfig, addUser: INIT_MODALS_CONFIG.addUser })}
-        onSuccess={() => setModalsConfig({ ...modalsConfig, addUser: INIT_MODALS_CONFIG.addUser })}
+        onOpenChange={() => setModalsConfig(INIT_MODALS_CONFIG)}
+        onSuccess={(e) => handleEditUser(e)}
       />
       <DangerConfirm
         confirmText="Видалити"
         description="Ви впевнені, що хочете видалити запис?"
         open={modalsConfig.deleteUser.open}
         onSuccess={() => handleDeleteUser(modalsConfig.deleteUser.userId as string)}
-        onOpenChange={() => setModalsConfig({ ...modalsConfig, deleteUser: INIT_MODALS_CONFIG.deleteUser })}
+        onOpenChange={() => setModalsConfig(INIT_MODALS_CONFIG)}
       />
     </div>
   )

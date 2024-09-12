@@ -1,7 +1,8 @@
-const { Menu, app, shell } = require("electron");
+const { Menu, app, dialog } = require("electron");
 
 // helpers
-const { NAVIGATE_TO } = require("./ipcEvents/ipcEventsKeys");
+const { importFiles } = require("./importFiles");
+const { CLEAR_DATA, READ_XLSX } = require("./ipcEvents/ipcEventsKeys");
 
 
 module.exports = function createMenu(isDev, win) {
@@ -9,27 +10,14 @@ module.exports = function createMenu(isDev, win) {
     {
       label: app.name,
       submenu: [
-        { label: "Overview", click: () => win.webContents.send(NAVIGATE_TO, "/overview") },
-        { label: "Feedback", click: () => win.webContents.send(NAVIGATE_TO, "/feedback") },
-        { label: "Extension", click: () => win.webContents.send(NAVIGATE_TO, "/extension") },
-        { label: "Settings", click: () => win.webContents.send(NAVIGATE_TO, "/settings") },
+        { label: "Імпортувати файл", click: () => importFiles().then(payload => win.webContents.send(READ_XLSX, payload)) },
+        { label: "Видалити всі дані", click: () => win.webContents.send(CLEAR_DATA) },
         { type: "separator" },
-        { label: "Log Out", click: () => win.webContents.send(NAVIGATE_TO, "/sign-in") },
+        { label: "Завершити роботу", click: () => app.quit() }
       ],
     },
     isDev && { role: "viewMenu" },
-    { role: "windowMenu" },
-    {
-      role: "help",
-      submenu: [
-        {
-          label: "Learn More",
-          click: async () => {
-            await shell.openExternal("https://analytic-wing-test.vercel.app/");
-          }
-        }
-      ]
-    }
+    { role: "windowMenu" }
   ].filter(Boolean);
 
   const menu = Menu.buildFromTemplate(template);

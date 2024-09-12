@@ -8,7 +8,7 @@ const {
   OPEN_FILE,
   OPEN_PATH,
   FOCUS_MAIN_WINDOW,
-  NAVIGATE_TO,
+  CLEAR_DATA,
   READ_XLSX
 } = require("./utils/ipcEvents/ipcEventsKeys");
 
@@ -26,5 +26,5 @@ contextBridge.exposeInMainWorld("electronAPI", {
   openFile: (payload) => ipcRenderer.send(OPEN_FILE, payload),
   openPath: (payload) => ipcRenderer.send(OPEN_PATH, payload),
   focusMainWindow: () => ipcRenderer.send(FOCUS_MAIN_WINDOW),
-  navigateTo: (payload) => ipcRenderer.on(NAVIGATE_TO, payload),
+  clearData: (callback) => ipcRenderer.on(CLEAR_DATA, callback),
 });

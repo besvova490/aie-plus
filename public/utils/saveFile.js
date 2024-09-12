@@ -1,9 +1,23 @@
+const { dialog } = require("electron");
 const fs = require("fs");
 
-const saveFile = ({ file, title, type }, app, callback) => {
-  const filePath = `${app.getPath("desktop")}/${title}.${type}`;
+const saveFile = async ({ file, title, type }, app, callback) => {
+  const { filePath } = await dialog.showSaveDialog({
+    buttonLabel: 'Save',
+    defaultPath: `${app.getPath("desktop")}/${title}.${type}`,
+  });
 
-  fs.writeFile(filePath, file, () => callback(filePath));
+  console.log("filePath", filePath);
+  if (filePath) {
+    try {
+      fs.writeFile(filePath, file);
+
+      console.log("filePath", filePath);
+      return callback(filePath);
+    } catch (error) {
+      return callback(null);
+    }
+  }
 };
 
 module.exports = {

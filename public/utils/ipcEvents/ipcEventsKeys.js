@@ -10,9 +10,11 @@ const OPEN_FILE = "OPEN_FILE";
 
 const OPEN_PATH = "OPEN_PATH";
 
-const NAVIGATE_TO = "NAVIGATE_TO";
-
 const READ_XLSX = "READ_XLSX";
+
+const IMPORT_FILE = "IMPORT_FILE";
+
+const CLEAR_DATA = "CLEAR_DATA";
 
 module.exports = {
   GET_WEB_APP_INFO,
@@ -22,6 +24,7 @@ module.exports = {
   OPEN_FILE,
   OPEN_PATH,
   FOCUS_MAIN_WINDOW,
-  NAVIGATE_TO,
-  READ_XLSX
+  READ_XLSX,
+  CLEAR_DATA,
+  IMPORT_FILE
 };

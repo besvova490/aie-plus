@@ -4,7 +4,7 @@ const path = require("path");
 class MainWindow extends BrowserWindow {
   constructor(isDev, config = {}) {
     super({
-      fullscreen: true,
+      fullscreen: isDev,
       webPreferences: {
         nodeIntegration: true,
         preload: path.join(__dirname, "../preload.js")

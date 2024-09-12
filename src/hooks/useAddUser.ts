@@ -77,7 +77,7 @@ export function useAddUser(props: IUseAddUser) {
           return user;
         })
       } else {
-        updatedUsersList.push(payload);
+        updatedUsersList.unshift(payload);
       }
       
       localStorage.setItem(SWR_KEYS.USERS_LIST, JSON.stringify(updatedUsersList));

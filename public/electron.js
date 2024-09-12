@@ -28,8 +28,7 @@ async function createWindow() {
 
   // prevent internet access
   win.webContents.session.webRequest.onBeforeRequest((details, callback) => {
-    // allow navigation to localhost
-    if (details.url.startsWith('http://localhost')) {
+    if (details.url.startsWith('http://localhost') || details.url.startsWith('file://')) {
       callback({});
 
       return;

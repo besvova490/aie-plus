@@ -1,6 +1,18 @@
 {
-  "presets": ["react-app"],
-  "plugins": [
-    "@loadable/babel-plugin"
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "useBuiltIns": "entry",
+        "corejs": "3",
+        "targets": {
+          "esmodules": true
+        }
+      }
+    ],
+    "@babel/preset-react"
+  ],
+  "ignore": [
+    "node_modules"
   ]
 }

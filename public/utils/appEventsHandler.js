@@ -9,8 +9,7 @@ module.exports = (app, win) => {
   
   app.on("open-url", function (event, url) {
     event.preventDefault();
-  
-    console.log(url);
+
     win.focus();
   });
 };

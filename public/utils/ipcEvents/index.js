@@ -1,4 +1,4 @@
-const { ipcMain, shell } = require("electron");
+const { ipcMain, shell, dialog } = require("electron");
 
 // helpers
 const getWebAppInfo = require("./getWebAppInfo");
@@ -13,6 +13,7 @@ const {
   OPEN_PATH,
   FOCUS_MAIN_WINDOW,
   READ_XLSX,
+  IMPORT_FILE,
 } = require("./ipcEventsKeys");
 
 module.exports = (app, win) => {

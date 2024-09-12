@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "main": "public/electron.js",
+  "homepage": "./",
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
     "@loadable/babel-plugin": "^5.16.1",
@@ -63,9 +64,39 @@
     "ts:check": "tsc --noEmit",
     "dev": "concurrently -k \"BROWSER=none NODE_ENV=development npm start\" \"npm:electron\"",
     "electron:dev": "wait-on tcp:3000 && nodemon --exec electron .",
-    "electron:build": "NODE_ENV=production npm run build && electron-builder -m -c.extraMetadata.main=build/electron.js",
+    "electron:build": "NODE_ENV=production npm run build && electron-builder -w -c.extraMetadata.main=build/electron.js",
     "electron": "wait-on tcp:3000 && electron .",
     "publish": "NODE_ENV=production npm run build && electron-builder -m -c.extraMetadata.main=build/electron.js --publish 'onTagOrDraft'"
+  },
+  "build": {
+    "appId": "com.aie-plus.app",
+    "copyright": "Copyright (c) 2024",
+    "productName": "AIE Plus",
+    "files": [
+      "build/**/*",
+      "node_modules/**/*",
+      "public/icon.ico",
+      "public/icon.icns"
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "public/icon.icns"
+    },
+    "win": {
+      "icon": "public/icon.ico",
+      "target": [{
+        "target": "nsis",
+        "arch": [
+          "x64",
+          "ia32",
+          "arm64"
+        ]
+      }]
+    }
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -83,6 +114,8 @@
     ]
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.25.4",
+    "@babel/preset-react": "^7.24.7",
     "@coax/eslint-config-fe-react": "^1.0.0",
     "@craco/craco": "^7.1.0",
     "@types/js-cookie": "^3.0.6",

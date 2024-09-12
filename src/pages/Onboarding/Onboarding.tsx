@@ -8,8 +8,7 @@ import { Button } from "@/common/button";
 
 // helpers
 import { ROUTES } from "@/constants/routes.constants";
-import { SWR_KEYS } from "@/swr/swrKeys.constants";
-import { sheetToJson } from "@/lib/sheetToJson";
+import { prepareUsersData } from "@/lib/prepareUsersData";
 
 
 function Onboarding() {
@@ -24,8 +23,7 @@ function Onboarding() {
   // effects
   useEffect(() => {
     window.electronAPI.readXlsxCallback((_, payload) => {
-      const sheets = payload.sheets.map(sheet => sheetToJson(sheet)).flat();
-      localStorage.setItem(SWR_KEYS.USERS_LIST, JSON.stringify(sheets));
+      prepareUsersData(payload.sheets);
       
       navigate(ROUTES.DASHBOARD.ROOT);
     });

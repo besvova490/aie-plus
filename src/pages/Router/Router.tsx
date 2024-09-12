@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from "react";
-import { createBrowserRouter, RouterProvider, redirect } from "react-router-dom";
+import { createMemoryRouter, RouterProvider, redirect } from "react-router-dom";
 
 // layouts
 const BaseLayout = lazy(() => import("../../layouts/BaseLayout"));
@@ -51,6 +51,6 @@ const ROOT_ROUTER = [
   },
 ];
 
-const Router = () => <RouterProvider router={createBrowserRouter(ROOT_ROUTER)} />;
+const Router = () => <RouterProvider router={createMemoryRouter(ROOT_ROUTER)} />;
 
 export default Router;

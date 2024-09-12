@@ -12,6 +12,7 @@ declare global {
       saveFileCallback: (callback: (e: any, payload: string) => void) => void;
       openPath: (payload: { path: string }) => void;
       openFile: (payload: { path: string }) => void;
+      clearData: (callback: () => void) => void;
     }
   }
 }
