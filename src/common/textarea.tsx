@@ -1,14 +1,12 @@
-import * as React from "react"
+import * as React from "react";
 
 // components
 import { LabelErrorProvider } from "@/common/labelErrorProvider";
 
 // helpers
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-
-export interface TextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   error?: string;
   fullWidth?: boolean;
@@ -34,9 +32,9 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           {...props}
         />
       </LabelErrorProvider>
-    )
+    );
   }
-)
-Textarea.displayName = "Textarea"
+);
+Textarea.displayName = "Textarea";
 
-export { Textarea }
+export { Textarea };

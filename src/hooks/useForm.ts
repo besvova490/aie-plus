@@ -1,5 +1,11 @@
 import { useCallback, useState } from "react";
-import { useForm as useReactHookForm, FieldValues, Path, PathValue, DefaultValues } from "react-hook-form";
+import {
+  useForm as useReactHookForm,
+  FieldValues,
+  Path,
+  PathValue,
+  DefaultValues
+} from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import debounce from "lodash.debounce";
 import * as yup from "yup";
@@ -15,18 +21,14 @@ export interface IUseFormProps<T> {
 }
 
 export function useForm<T extends FieldValues = FieldValues>(props: IUseFormProps<T>) {
-  const {
-    defaultValues, validationSchema, onSubmit: onSubmitProp, ...formConfig
-  } = props;
+  const { defaultValues, validationSchema, onSubmit: onSubmitProp, ...formConfig } = props;
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {
-    setValue, handleSubmit, trigger, ...rest
-  } = useReactHookForm<T>({
+  const { setValue, handleSubmit, trigger, ...rest } = useReactHookForm<T>({
     resolver: yupResolver(validationSchema),
     defaultValues,
-    ...formConfig,
+    ...formConfig
   });
 
   const debouncedTrigger = useCallback(debounce(trigger, 300), []);
@@ -57,6 +59,6 @@ export function useForm<T extends FieldValues = FieldValues>(props: IUseFormProp
     trigger,
     setValue: handleChange,
     onSubmit: handleSubmit(onSubmit),
-    ...rest,
+    ...rest
   };
 }

@@ -1,4 +1,5 @@
 import get from "lodash.get";
+import dayjs from "dayjs";
 
 // components
 import { Input } from "@/common/input";
@@ -14,12 +15,16 @@ import { TABLE_COLUMNS, useUsersList } from "@/swr/useUsersList";
 // types
 import { IAddUserDialog } from "./AddUserDialog.interface";
 
-
 function AddUserDialogContent(props: IAddUserDialog) {
   const { value, onSuccess, onOpenChange } = props;
   const { options } = useUsersList();
 
-  const { setValue, watch, onSubmit, formState: { errors } } = useAddUser({
+  const {
+    setValue,
+    watch,
+    onSubmit,
+    formState: { errors }
+  } = useAddUser({
     onSubmit: (data) => {
       onSuccess && onSuccess(data);
     },
@@ -39,32 +44,31 @@ function AddUserDialogContent(props: IAddUserDialog) {
           error={get(errors, "fullName.message", "") as string}
           fullWidth
         />
-        {
-          TABLE_COLUMNS.filter(column => column.isSelectable).map((column) => (
-            <Select
-              key={column.dataIndex}
-              label={column.title}
-              options={(get(options, column.dataIndex, []) as { value: string; label: string }[])
-                .filter(option => !!option.value)}
-              value={values[column.dataIndex]}
-              error={get(errors, `${column.dataIndex}.message`, "") as string}
-              onChange={(e) => setValue(column.dataIndex, e)}
-              isSearchable
-              isCreatable
-              fullWidth
-            />
-          ))
-        }
+        {TABLE_COLUMNS.filter((column) => column.isSelectable).map((column) => (
+          <Select
+            key={column.dataIndex}
+            label={column.title}
+            options={(
+              get(options, column.dataIndex, []) as { value: string; label: string }[]
+            ).filter((option) => !!option.value)}
+            value={values[column.dataIndex]}
+            error={get(errors, `${column.dataIndex}.message`, "") as string}
+            onChange={(e) => setValue(column.dataIndex, e)}
+            isSearchable
+            isCreatable
+            fullWidth
+          />
+        ))}
         <DatePicker
           label="Початок підготовки"
-          value={values.period.from as unknown as Date}
+          value={values.period.from ? dayjs(values.period.from) : null}
           onChange={(e) => setValue("period.from", e)}
           error={get(errors, "period.from.message", "") as string}
           fullWidth
         />
         <DatePicker
           label="Кінець підготовки"
-          value={values.period.to as unknown as Date}
+          value={values.period.to ? dayjs(values.period.to) : null}
           onChange={(e) => setValue("period.to", e)}
           error={get(errors, "period.to.message", "") as string}
           fullWidth
@@ -78,10 +82,10 @@ function AddUserDialogContent(props: IAddUserDialog) {
         />
       </div>
       <div className="flex items-center justify-between gap-4 border-t border-gray-200 pt-4">
-        <Button onClick={() => onOpenChange?.(false)} variant="outline">Скасувати</Button>
-        <Button type="submit">
-          { value?.id ? "Редагувати" : "Додати" }
+        <Button onClick={() => onOpenChange?.(false)} variant="outline">
+          Скасувати
         </Button>
+        <Button type="submit">{value?.id ? "Редагувати" : "Додати"}</Button>
       </div>
     </form>
   );

@@ -1,4 +1,4 @@
 export const SWR_KEYS = {
   USERS_LIST: "users_list",
-  USERS_FILTERS: "users_filters",
-}
+  USERS_FILTERS: "users_filters"
+};

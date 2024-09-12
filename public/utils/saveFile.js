@@ -7,14 +7,13 @@ const saveFile = async ({ file, title, type }, app, callback) => {
     defaultPath: `${app.getPath("desktop")}/${title}.${type}`,
   });
 
-  console.log("filePath", filePath);
   if (filePath) {
     try {
-      fs.writeFile(filePath, file);
+      fs.writeFile(filePath, file, () => null);
 
-      console.log("filePath", filePath);
       return callback(filePath);
     } catch (error) {
+      console.log("error", error);
       return callback(null);
     }
   }

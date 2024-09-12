@@ -14,6 +14,7 @@ import { Accordion } from "@/common/accordion";
 import AddUserDialog from "@/components/dialogs/AddUserDialog";
 import { DatePickerWithRange } from "@/common/date-range-picker";
 import DangerConfirm from "@/components/dialogs/DangerConfirm";
+import GenerateReportDialog from "@/components/dialogs/GenerateReportDialog";
 
 // helpers
 import { useToast } from "@/hooks/use-toast";
@@ -24,7 +25,6 @@ import { useQueryParams } from "@/hooks/useQueryParams";
 import { generateReport } from "@/lib/generateReport";
 import { exportTable } from "@/lib/exportTable";
 
-
 type TModalsConfig = {
   addUser: {
     open: boolean;
@@ -34,17 +34,23 @@ type TModalsConfig = {
     open: boolean;
     userId: string | null;
   };
-}
+  generateReport: {
+    open: boolean;
+  };
+};
 const INIT_MODALS_CONFIG: TModalsConfig = {
   addUser: {
     open: false,
-    value: null,
+    value: null
   },
   deleteUser: {
     open: false,
-    userId: null,
+    userId: null
+  },
+  generateReport: {
+    open: false
   }
-}
+};
 
 function Dashboard() {
   const [params, setParams, clearQueryParams] = useQueryParams();
@@ -66,67 +72,92 @@ function Dashboard() {
 
     toast({
       description: `Запис про ${user.fullName} видалено`,
-      variant: "destructive",
+      variant: "destructive"
     });
-  }
+  };
 
   const handleEditUser = (user: ISingleUser) => {
     setModalsConfig(INIT_MODALS_CONFIG);
 
     toast({
       description: `Запис про ${user.fullName} змінено`,
-      variant: "success",
+      variant: "success"
     });
-  }
+  };
 
-  const handleGenerateReport = () => {
+  const handleGenerateReport = (year: string) => {
     const users = localStorage.getItem(SWR_KEYS.USERS_LIST);
     const usersData = users ? JSON.parse(users) : [];
-    
-    generateReport(usersData).then(arrayBuffer => {
-      window.electronAPI.saveFile({ file: arrayBuffer, title: `Звіт-про-підготовку_${dayjs().format("DD-MM-YYYY_HH:mm:ss")}`, type: "xlsx" });
+
+    generateReport(usersData, year).then((arrayBuffer) => {
+      setModalsConfig(INIT_MODALS_CONFIG);
+
+      window.electronAPI.saveFile({
+        file: arrayBuffer,
+        title: `Звіт-про-підготовку_${dayjs().format("DD-MM-YYYY_HH:mm:ss")}`,
+        type: "xlsx"
+      });
     });
-  }
+  };
 
   const handleExportTable = () => {
     const users = localStorage.getItem(SWR_KEYS.USERS_LIST);
     const usersData = users ? JSON.parse(users) : [];
 
-    exportTable(filterDataSource(usersData, params.search || "", params)).then(arrayBuffer => {
-      window.electronAPI.saveFile({ file: arrayBuffer, title: `Підготовка_${dayjs().format("DD-MM-YYYY_HH:mm:ss")}`, type: "xlsx" });
+    exportTable(filterDataSource(usersData, params.search || "", params)).then((arrayBuffer) => {
+      window.electronAPI.saveFile({
+        file: arrayBuffer,
+        title: `Підготовка_${dayjs().format("DD-MM-YYYY_HH:mm:ss")}`,
+        type: "xlsx"
+      });
     });
-  }
+  };
 
   // effects
   useEffect(() => {
     window.electronAPI.saveFileCallback((_, filePath) => {
       toast({
-        description: "Файл збережено",
+        title: "Файл збережено",
+        description: (
+          <span className="block max-w-[320px]">Файл збережено за шляхом: {filePath}</span>
+        ),
         variant: "success",
         action: (
-          <ToastAction altText="Open file" className="flex items-center justify-center gap-2 ml-8">
-            <Button size="sm" variant="outline" onClick={() => window.electronAPI.openFile({ path: filePath })}>Відкрити Файл</Button>
-            <Button size="sm" onClick={() => window.electronAPI.openPath({ path: filePath })}>Відкрити Папку</Button>
+          <ToastAction
+            altText="Open file"
+            className="flex flex-col items-center justify-center gap-2 ml-8"
+          >
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => window.electronAPI.openFile({ path: filePath })}
+            >
+              Відкрити Файл
+            </Button>
+            <Button size="sm" onClick={() => window.electronAPI.openPath({ path: filePath })}>
+              Відкрити Папку
+            </Button>
           </ToastAction>
         )
       });
     });
   }, []);
 
-
   const renderActiveFilters = () => {
-    const activeFilters = TABLE_COLUMNS.filter(column => column.isSelectable).map((filter) => {
-      const value = get(params, filter.dataIndex, "");
+    const activeFilters = TABLE_COLUMNS.filter((column) => column.isSelectable)
+      .map((filter) => {
+        const value = get(params, filter.dataIndex, "");
 
-      if (!value) {
-        return "";
-      }
+        if (!value) {
+          return "";
+        }
 
-      return `${filter.title}: ${value}`;
-    }).filter(Boolean);
-    
+        return `${filter.title}: ${value}`;
+      })
+      .filter(Boolean);
+
     return activeFilters.join("; ");
-  }
+  };
 
   const activeFilters = renderActiveFilters();
 
@@ -140,60 +171,67 @@ function Dashboard() {
           placeholder="Миколенко Микола Миколайович"
           fullWidth
           value={get(params, "search", "")}
-          onChange={e => setParams({ search: e.target.value, page: null })}
+          onChange={(e) => setParams({ search: e.target.value, page: null })}
         />
         <DatePickerWithRange
           label="Період з/по"
           fullWidth
           value={{
             from: (params.from && new Date(params.from)) as Date,
-            to: (params.to && new Date(params.to)) as Date,
+            to: (params.to && new Date(params.to)) as Date
           }}
-          onChange={e => setParams({ from: e?.from ? dayjs(e.from).format("YYYY-MM-DD") : null, to: e?.to ? dayjs(e.to).format("YYYY-MM-DD") : null })}
+          onChange={(e) => setParams({
+            from: e?.from ? dayjs(e.from).format("YYYY-MM-DD") : null,
+            to: e?.to ? dayjs(e.to).format("YYYY-MM-DD") : null
+          })
+          }
         />
       </div>
       <Accordion
         items={[
           {
-            label: <span className="text-left">{ activeFilters ? `Активні фільтри: ${activeFilters}` : "Фільтри" }</span>,
+            label: (
+              <span className="text-left">
+                {activeFilters ? `Активні фільтри: ${activeFilters}` : "Фільтри"}
+              </span>
+            ),
             value: "filters",
             children: (
               <div className="grid grid-cols-4 gap-4">
-                {
-                  TABLE_COLUMNS.filter(column => column.isSelectable).map((filter) => (
-                    <Select
-                      key={filter.dataIndex}
-                      label={filter.title}
-                      placeholder={filter.title}
-                      options={get(options, filter.dataIndex, [])}
-                      fullWidth
-                      isSearchable
-                      value={get(params, filter.dataIndex, "")}
-                      onChange={e => setParams({ [filter.dataIndex]: e || null })}
-                    />
-                  ))
-                }
+                {TABLE_COLUMNS.filter((column) => column.isSelectable).map((filter) => (
+                  <Select
+                    key={filter.dataIndex}
+                    label={filter.title}
+                    placeholder={filter.title}
+                    options={get(options, filter.dataIndex, [])}
+                    fullWidth
+                    isSearchable
+                    value={get(params, filter.dataIndex, "")}
+                    onChange={(e) => setParams({ [filter.dataIndex]: e || null })}
+                  />
+                ))}
               </div>
             )
           }
         ]}
       />
       <div className="flex items-start justify-start gap-4">
-        <Button onClick={() => setModalsConfig({ ...modalsConfig, addUser: { open: true, value: null } })}>
+        <Button
+          onClick={() => setModalsConfig({ ...modalsConfig, addUser: { open: true, value: null } })}
+        >
           <Plus size={18} />
           Додати Запис
         </Button>
-        <Button
-          onClick={() => clearQueryParams()}
-          variant="outline"
-        >
+        <Button onClick={() => clearQueryParams()} variant="outline">
           Скинути фільтри
         </Button>
         <Button variant="outline" className="ml-auto" onClick={handleExportTable}>
           <FileDown size={18} />
           Експорт
         </Button>
-        <Button onClick={handleGenerateReport}>
+        <Button
+          onClick={() => setModalsConfig((state) => ({ ...state, generateReport: { open: true } }))}
+        >
           <FileSpreadsheet size={18} />
           Згенерувати Звіт
         </Button>
@@ -210,12 +248,17 @@ function Dashboard() {
                 <PenSquare
                   size={22}
                   className="text-blue-400 hover:text-blue-600 cursor-pointer"
-                  onClick={() => setModalsConfig({ ...modalsConfig, addUser: { open: true, value: record } })}
+                  onClick={() => setModalsConfig({ ...modalsConfig, addUser: { open: true, value: record } })
+                  }
                 />
                 <Trash2
                   size={22}
                   className="text-red-400 hover:text-red-600 cursor-pointer"
-                  onClick={() => setModalsConfig({ ...modalsConfig, deleteUser: { open: true, userId: record.id } })}
+                  onClick={() => setModalsConfig({
+                    ...modalsConfig,
+                    deleteUser: { open: true, userId: record.id }
+                  })
+                  }
                 />
               </div>
             )
@@ -225,7 +268,7 @@ function Dashboard() {
           total: total || 0,
           current: +get(params, "page", 1),
           pageSize: +get(params, "pageSize", 10),
-          onPageChange: (page) => setParams({ page }),
+          onPageChange: (page) => setParams({ page })
         }}
       />
       <AddUserDialog
@@ -241,8 +284,13 @@ function Dashboard() {
         onSuccess={() => handleDeleteUser(modalsConfig.deleteUser.userId as string)}
         onOpenChange={() => setModalsConfig(INIT_MODALS_CONFIG)}
       />
+      <GenerateReportDialog
+        open={modalsConfig.generateReport.open}
+        onOpenChange={() => setModalsConfig(INIT_MODALS_CONFIG)}
+        onSuccess={handleGenerateReport}
+      />
     </div>
-  )
+  );
 }
 
 export default Dashboard;

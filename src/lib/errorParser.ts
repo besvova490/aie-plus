@@ -1,14 +1,13 @@
-export function errorParser(
-  errorObject: { [key: string]: string[] | { [nestedKey: string]: string[] | string }[] },
-) {
+export function errorParser(errorObject: {
+  [key: string]: string[] | { [nestedKey: string]: string[] | string }[];
+}) {
   const errors = {} as { [key: string]: string | Record<string, string> };
 
   Object.keys(errorObject).forEach((key) => {
     if (errorObject.hasOwnProperty(key)) {
       // If errorObject[key] is an array, get first element of the array as the error
-      const error = Array.isArray(errorObject[key]) && errorObject[key].length > 0
-        ? errorObject[key][0]
-        : null;
+      const error =
+        Array.isArray(errorObject[key]) && errorObject[key].length > 0 ? errorObject[key][0] : null;
       if (error) {
         errors[key] = error as string;
       } else if (Object.keys(errorObject[key]).length > 0) {

@@ -3,7 +3,6 @@ import { useLocation, Link } from "react-router-dom";
 // assets
 // import "../assets/styles/pages/home.scss";
 
-
 function Home() {
   const location = useLocation();
 

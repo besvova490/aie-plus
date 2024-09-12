@@ -20,7 +20,7 @@ export function Search({ timeout = 500, value, onChange, ...props }: SearchProps
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     debounced(() => onChange?.(e));
     setSearch(e.target.value);
-  }
+  };
 
   // effects
   useEffect(() => {
@@ -32,8 +32,8 @@ export function Search({ timeout = 500, value, onChange, ...props }: SearchProps
     <Input
       value={search}
       onChange={handleChange}
-      addonBefore={<SearchIcon size={18}/>}
+      addonBefore={<SearchIcon size={18} />}
       {...props}
     />
-  )
+  );
 }

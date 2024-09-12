@@ -1,8 +1,8 @@
 export const ROUTES = {
   DASHBOARD: {
-    ROOT: "/dashboard",
+    ROOT: "/dashboard"
   },
   ONBOARDING: {
-    ROOT: "/onboarding",
-  },
-}
+    ROOT: "/onboarding"
+  }
+};

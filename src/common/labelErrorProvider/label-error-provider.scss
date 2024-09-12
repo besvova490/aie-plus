@@ -5,14 +5,14 @@
   justify-content: flex-start;
 
   grid-template-areas:
-  "label label"
-  "field field"
-  "error error";
+    "label label"
+    "field field"
+    "error error";
 
   &_left {
     grid-template-areas:
-    "label field"
-    "error error";
+      "label field"
+      "error error";
   }
 
   &:not(&:has(.hdep-label-error-provider__label)) {

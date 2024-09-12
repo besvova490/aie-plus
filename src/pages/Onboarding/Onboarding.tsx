@@ -10,21 +10,20 @@ import { Button } from "@/common/button";
 import { ROUTES } from "@/constants/routes.constants";
 import { prepareUsersData } from "@/lib/prepareUsersData";
 
-
 function Onboarding() {
   const navigate = useNavigate();
-  
+
   // methods
   const handleDrop = async (acceptedFiles: File[]) => {
-    const data = await Promise.all(acceptedFiles.map(file => file.arrayBuffer()));
+    const data = await Promise.all(acceptedFiles.map((file) => file.arrayBuffer()));
     window.electronAPI.readXlsx({ data });
-  }
+  };
 
   // effects
   useEffect(() => {
     window.electronAPI.readXlsxCallback((_, payload) => {
       prepareUsersData(payload.sheets);
-      
+
       navigate(ROUTES.DASHBOARD.ROOT);
     });
   }, []);
@@ -35,24 +34,25 @@ function Onboarding() {
       <Dropzone
         accept={{
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
-          "application/vnd.ms-excel": [".xls"],
+          "application/vnd.ms-excel": [".xls"]
         }}
         onDrop={handleDrop}
       >
-        {
-          ({ getRootProps, getInputProps }) => (
-            <div {...getRootProps()} className="flex flex-col items-center justify-center gap-6 min-w-[420px] min-h-[320px] w-3/5 border border-dashed rounded-lg bg-slate-100">
-              <input {...getInputProps()} />
-              <p className="text-center text-lg text-slate-900">
-                Перетягніть або натисніть, щоб завантажити файл
-              </p>
-              <Button>
-                <FileUp size={18}/>
-                Завантажити таблицю
-              </Button>
-            </div>
-          )
-        }
+        {({ getRootProps, getInputProps }) => (
+          <div
+            {...getRootProps()}
+            className="flex flex-col items-center justify-center gap-6 min-w-[420px] min-h-[320px] w-3/5 border border-dashed rounded-lg bg-slate-100"
+          >
+            <input {...getInputProps()} />
+            <p className="text-center text-lg text-slate-900">
+              Перетягніть або натисніть, щоб завантажити файл
+            </p>
+            <Button>
+              <FileUp size={18} />
+              Завантажити таблицю
+            </Button>
+          </div>
+        )}
       </Dropzone>
     </div>
   );

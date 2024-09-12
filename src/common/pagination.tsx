@@ -8,7 +8,6 @@ import { Button } from "@/common/button";
 // helpers
 import { cn } from "@/lib/utils";
 
-
 export interface IPagination extends React.ComponentProps<"nav"> {
   total: number;
   current: number;
@@ -34,12 +33,11 @@ function getPages(currentPage: number, totalPages: number) {
       pages.push({ label: "...", value: currentPage - 3 });
     }
 
-    const start = currentPage + 2 >= totalPages
-      ? totalPages - 2
-      : Math.max(2, currentPage - 1);
-    const end = currentPage + 3 >= totalPages
-      ? totalPages - 1
-      : Math.min(Math.max(currentPage + 1, 3), totalPages - 1);
+    const start = currentPage + 2 >= totalPages ? totalPages - 2 : Math.max(2, currentPage - 1);
+    const end =
+      currentPage + 3 >= totalPages
+        ? totalPages - 1
+        : Math.min(Math.max(currentPage + 1, 3), totalPages - 1);
 
     for (let index = start; index <= end; index++) {
       pages.push({ value: index, label: index });
@@ -52,12 +50,20 @@ function getPages(currentPage: number, totalPages: number) {
     pages.push({ value: totalPages, label: totalPages });
   }
 
-  return pages as { value: number, label: number | string }[];
+  return pages as { value: number; label: number | string }[];
 }
 
-
 const Pagination = (props: IPagination) => {
-  const { className, total, current, pageSize, onPageChange, allowSizeChange, onPageSizeChange, ...rest } = props;
+  const {
+    className,
+    total,
+    current,
+    pageSize,
+    onPageChange,
+    allowSizeChange,
+    onPageSizeChange,
+    ...rest
+  } = props;
 
   const [currentPage, setCurrentPage] = useState(current);
 
@@ -75,7 +81,7 @@ const Pagination = (props: IPagination) => {
   }, [current]);
 
   // renders
-  const renderPaginationItem = (page: { value: number, label: number | string }, index: number) => {
+  const renderPaginationItem = (page: { value: number; label: number | string }, index: number) => {
     return (
       <li key={`${index}-${page}`}>
         <Button
@@ -83,9 +89,7 @@ const Pagination = (props: IPagination) => {
           onClick={() => handlePageChange(page.value as number)}
           className="w-10 h-10 p-0"
         >
-          {
-            page.label !== "..." ? page.label : <MoreHorizontal className="h-4 w-4" />
-          }
+          {page.label !== "..." ? page.label : <MoreHorizontal className="h-4 w-4" />}
         </Button>
       </li>
     );
@@ -98,29 +102,33 @@ const Pagination = (props: IPagination) => {
       className={cn("mx-auto flex w-full justify-center", className)}
       {...rest}
     >
-      {
-        allowSizeChange && (
-          <Select
-            label="Rows per page"
-            labelPlacement="left"
-            options={PAGE_SIZE_OPTIONS}
-            value={pageSize}
-            onChange={(size) => onPageSizeChange && onPageSizeChange(size as unknown as number)}
-          />
-        )
-      }
+      {allowSizeChange && (
+        <Select
+          label="Rows per page"
+          labelPlacement="left"
+          options={PAGE_SIZE_OPTIONS}
+          value={pageSize}
+          onChange={(size) => onPageSizeChange && onPageSizeChange(size as unknown as number)}
+        />
+      )}
       <ul className="flex flex-row items-center gap-1 ml-auto">
         <li>
-          <Button variant="link" disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>
+          <Button
+            variant="link"
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+          >
             <ChevronLeft className="h-4 w-4" />
             <span>Previous</span>
           </Button>
         </li>
-        {
-          getPages(currentPage, lastPage).map((item, index) => renderPaginationItem(item, index))
-        }
+        {getPages(currentPage, lastPage).map((item, index) => renderPaginationItem(item, index))}
         <li>
-          <Button variant="link" disabled={currentPage === lastPage} onClick={() => handlePageChange(currentPage + 1)}>
+          <Button
+            variant="link"
+            disabled={currentPage === lastPage}
+            onClick={() => handlePageChange(currentPage + 1)}
+          >
             <span>Next</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -128,7 +136,7 @@ const Pagination = (props: IPagination) => {
       </ul>
     </nav>
   );
-}
-Pagination.displayName = "Pagination"
+};
+Pagination.displayName = "Pagination";
 
-export { Pagination }
+export { Pagination };

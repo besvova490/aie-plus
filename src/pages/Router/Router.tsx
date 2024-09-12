@@ -12,7 +12,6 @@ const Onboarding = lazy(() => import("../Onboarding"));
 import { SWR_KEYS } from "@/swr/swrKeys.constants";
 import { ROUTES } from "../../constants/routes.constants";
 
-
 const renderWithSuspense = (Component: React.LazyExoticComponent<() => React.JSX.Element>) => (
   <Suspense fallback="...">
     <Component />
@@ -28,27 +27,27 @@ const ROOT_ROUTER = [
         path: "/",
         loader: async () => {
           return redirect(ROUTES.DASHBOARD.ROOT);
-        },
+        }
       },
       {
         path: ROUTES.DASHBOARD.ROOT,
         element: renderWithSuspense(Dashboard),
         loader: async () => {
           const dataSource = localStorage.getItem(SWR_KEYS.USERS_LIST);
-    
+
           if (!dataSource) {
             return redirect(ROUTES.ONBOARDING.ROOT);
           }
-    
+
           return null;
         }
       },
       {
         path: ROUTES.ONBOARDING.ROOT,
         element: renderWithSuspense(Onboarding)
-      },
+      }
     ]
-  },
+  }
 ];
 
 const Router = () => <RouterProvider router={createMemoryRouter(ROOT_ROUTER)} />;

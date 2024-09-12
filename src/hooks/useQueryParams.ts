@@ -12,7 +12,7 @@ export const useQueryParams = <T = { [key: string]: string | undefined }>(custom
   }
 
   const setQueryParams = (obj: Record<string, string>, config?: NavigateOptions) => {
-    Object.keys(obj).forEach(key => {
+    Object.keys(obj).forEach((key) => {
       if (typeof obj[key] !== "undefined" && obj[key] !== null) {
         params.set(key, obj[key]);
       } else {
@@ -25,11 +25,11 @@ export const useQueryParams = <T = { [key: string]: string | undefined }>(custom
 
   const clearQueryParams = () => {
     setSearch({}.toString());
-  }
+  };
 
-  return [
-    queryParams,
-    setQueryParams,
-    clearQueryParams
-  ] as [T, (obj: Record<string, unknown>, shouldReplace?: boolean) => void, () => void];
+  return [queryParams, setQueryParams, clearQueryParams] as [
+    T,
+    (obj: Record<string, unknown>, shouldReplace?: boolean) => void,
+    () => void
+  ];
 };

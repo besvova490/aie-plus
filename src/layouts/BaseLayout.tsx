@@ -10,7 +10,6 @@ import { prepareUsersData } from "@/lib/prepareUsersData";
 // assets
 import logo from "@/assets/images/logo.png";
 
-
 function BaseLayout() {
   const navigate = useNavigate();
   const { mutate } = useSWR(SWR_KEYS.USERS_LIST);
@@ -27,7 +26,7 @@ function BaseLayout() {
       prepareUsersData(payload.sheets);
 
       mutate();
-    })
+    });
   }, []);
 
   // renders
@@ -37,11 +36,9 @@ function BaseLayout() {
         <div className="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden">
           <img src={logo} alt="logo" className="object-cover" />
         </div>
-        <h1 className="text-2xl font-bold">
-          AIE Plus
-        </h1>
+        <h1 className="text-2xl font-bold">AIE Plus</h1>
       </div>
-      <Outlet/>
+      <Outlet />
     </main>
   );
 }
