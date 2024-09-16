@@ -1,11 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import get from "lodash.get";
 import dayjs from "dayjs";
 import { Plus, FileSpreadsheet, PenSquare, Trash2, FileDown } from "lucide-react";
 
 // components
-import { Toaster } from "@/common/toaster";
-import { ToastAction } from "@/common/toast";
 import { Table } from "@/common/table";
 import { Select } from "@/common/select";
 import { Search } from "@/components/Search";
@@ -89,15 +87,7 @@ function Dashboard() {
     const users = localStorage.getItem(SWR_KEYS.USERS_LIST);
     const usersData = users ? JSON.parse(users) : [];
 
-    generateReport(usersData, year).then((arrayBuffer) => {
-      setModalsConfig(INIT_MODALS_CONFIG);
-
-      window.electronAPI.saveFile({
-        file: arrayBuffer,
-        title: `Звіт-про-підготовку_${dayjs().format("DD-MM-YYYY_HH:mm:ss")}`,
-        type: "xlsx"
-      });
-    });
+    generateReport(usersData, year).then(() => setModalsConfig(INIT_MODALS_CONFIG));
   };
 
   const handleExportTable = () => {
@@ -112,36 +102,6 @@ function Dashboard() {
       });
     });
   };
-
-  // effects
-  useEffect(() => {
-    window.electronAPI.saveFileCallback((_, filePath) => {
-      toast({
-        title: "Файл збережено",
-        description: (
-          <span className="block max-w-[320px]">Файл збережено за шляхом: {filePath}</span>
-        ),
-        variant: "success",
-        action: (
-          <ToastAction
-            altText="Open file"
-            className="flex flex-col items-center justify-center gap-2 ml-8"
-          >
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => window.electronAPI.openFile({ path: filePath })}
-            >
-              Відкрити Файл
-            </Button>
-            <Button size="sm" onClick={() => window.electronAPI.openPath({ path: filePath })}>
-              Відкрити Папку
-            </Button>
-          </ToastAction>
-        )
-      });
-    });
-  }, []);
 
   const renderActiveFilters = () => {
     const activeFilters = TABLE_COLUMNS.filter((column) => column.isSelectable)
@@ -164,7 +124,6 @@ function Dashboard() {
   // renders
   return (
     <div className="px-4 py-8 flex flex-col gap-4">
-      <Toaster />
       <div className="grid grid-cols-[320px_320px] gap-4">
         <Search
           label="Пошук за П.І.Б"

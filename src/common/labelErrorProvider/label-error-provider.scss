@@ -18,6 +18,11 @@
   &:not(&:has(.hdep-label-error-provider__label)) {
     gap: 0;
   }
+  &:not(&:has(.hdep-label-error-provider__error)) {
+    grid-template-areas:
+    "label label"
+    "field field";
+  }
 
   &__label {
     grid-area: label;

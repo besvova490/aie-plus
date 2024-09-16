@@ -1,6 +1,7 @@
 export const ROUTES = {
   DASHBOARD: {
-    ROOT: "/dashboard"
+    ROOT: "/dashboard",
+    REPORT: "/dashboard/report",
   },
   ONBOARDING: {
     ROOT: "/onboarding"
