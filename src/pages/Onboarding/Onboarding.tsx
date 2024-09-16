@@ -8,7 +8,6 @@ import { Button } from "@/common/button";
 
 // helpers
 import { ROUTES } from "@/constants/routes.constants";
-import { prepareUsersData } from "@/lib/prepareUsersData";
 
 function Onboarding() {
   const navigate = useNavigate();
@@ -21,9 +20,7 @@ function Onboarding() {
 
   // effects
   useEffect(() => {
-    window.electronAPI.readXlsxCallback((_, payload) => {
-      prepareUsersData(payload.sheets);
-
+    window.electronAPI.readXlsxCallback(() => {
       navigate(ROUTES.DASHBOARD.ROOT);
     });
   }, []);

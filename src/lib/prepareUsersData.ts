@@ -37,7 +37,13 @@ export function prepareUsersData(users?: ISheet[]) {
   const currentUsersList = JSON.parse(localStorage.getItem(SWR_KEYS.USERS_LIST) as string) || [];
   const currentFilters = JSON.parse(localStorage.getItem(SWR_KEYS.USERS_FILTERS) as string) || {};
 
-  const newUsers = [...(users || []).map((user) => sheetToJson(user)).flat(), ...currentUsersList];
+  const newUsers = [
+    ...(users || []).map((user) => sheetToJson(user)).flat(),
+    ...currentUsersList
+  ].map((item, index) => ({
+    ...item,
+    orderNumber: index + 1,
+  }));
 
   const filters = TABLE_COLUMNS.filter((column) => column.isSelectable).reduce(
     (acc, column) => ({

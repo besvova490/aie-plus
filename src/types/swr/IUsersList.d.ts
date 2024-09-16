@@ -3,6 +3,7 @@ import { TPrimitive } from "../utils/TPrimitive";
 
 export interface ISingleUser {
   [key: string]: TPrimitive;
+  orderNumber: number;
   id: string;
   order: number;
   subdivision: string;

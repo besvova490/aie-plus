@@ -167,7 +167,7 @@ export const generateReport = async (data: ISingleUser[], year: string) => {
 
   window.electronAPI.saveFile({
     file: buffer,
-    title: `Звіт-про-підготовку_${dayjs().set("year", +year).format("DD-MM-YYYY_HH:mm:ss")}`,
+    title: `Звіт-про-підготовку_${dayjs().set("year", +year).format("DD-MM-YYYY_HH")}`,
     type: "xlsx"
   });
 

@@ -16,11 +16,11 @@ const HEADER_BORDER: Partial<exceljs.Borders> = {
 };
 
 const TABLE_COLUMNS = [
-  { header: "№ з/п", key: "index", rowSpan: 3 },
+  { header: "№ з/п", key: "orderNumber", rowSpan: 3 },
   { header: "Підрозділ", key: "subdivision", rowSpan: 3 },
   { header: "Посада", key: "position", rowSpan: 3 },
   { header: "в/звання", key: "rank", rowSpan: 3 },
-  { header: "П.І.Б", key: "fullName", rowSpan: 3 },
+  { header: "П.І.Б.", key: "fullName", rowSpan: 3 },
   {
     header: "Підготовка",
     key: "preparation",
@@ -133,9 +133,7 @@ export const exportTable = async (data: ISingleUser[]) => {
       };
       cell.border = HEADER_BORDER;
 
-      if (column.key === "index") {
-        cell.value = index + 1;
-      } else if (column.key === "daysCount") {
+      if (column.key === "daysCount") {
         const period = get(user, "period");
         const daysCount = dayjs(period.to).diff(period.from, "day");
 

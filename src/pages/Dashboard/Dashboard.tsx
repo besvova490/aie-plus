@@ -97,7 +97,7 @@ function Dashboard() {
     exportTable(filterDataSource(usersData, params.search || "", params)).then((arrayBuffer) => {
       window.electronAPI.saveFile({
         file: arrayBuffer,
-        title: `Підготовка_${dayjs().format("DD-MM-YYYY_HH:mm:ss")}`,
+        title: `Підготовка_${dayjs().format("DD-MM-YYYY_HH")}`,
         type: "xlsx"
       });
     });
@@ -226,7 +226,7 @@ function Dashboard() {
         pagination={{
           total: total || 0,
           current: +get(params, "page", 1),
-          pageSize: +get(params, "pageSize", 10),
+          pageSize: +get(params, "pageSize", 100),
           onPageChange: (page) => setParams({ page })
         }}
       />

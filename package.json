@@ -63,7 +63,7 @@
     "ts:check": "tsc --noEmit",
     "dev": "concurrently -k \"BROWSER=none NODE_ENV=development npm start\" \"npm:electron\"",
     "electron:dev": "wait-on tcp:127.0.0.1:3000 && nodemon --exec electron .",
-    "electron:build": "NODE_ENV=production npm run build && electron-builder -w -c.extraMetadata.main=build/electron.js",
+    "electron:build": "NODE_ENV=production npm run build && electron-builder -m -c.extraMetadata.main=build/electron.js",
     "electron": "wait-on tcp:127.0.0.1:3000 && electron .",
     "publish": "NODE_ENV=production npm run build && electron-builder -m -c.extraMetadata.main=build/electron.js --publish 'onTagOrDraft'"
   },
@@ -90,11 +90,7 @@
       "target": [
         {
           "target": "nsis",
-          "arch": [
-            "x64",
-            "ia32",
-            "arm64"
-          ]
+          "arch": ["x64"]
         }
       ]
     }

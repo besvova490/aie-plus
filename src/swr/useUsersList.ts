@@ -22,9 +22,8 @@ interface IUseUsersList {
 export const TABLE_COLUMNS = [
   {
     title: "№ з/п",
-    dataIndex: "index",
+    dataIndex: "orderNumber",
     className: "whitespace-nowrap",
-    render: (_: unknown, __: unknown, index: number) => index + 1
   },
   {
     title: "Підрозділ",
@@ -48,7 +47,7 @@ export const TABLE_COLUMNS = [
     isSelectable: true
   },
   {
-    title: "П.І.Б",
+    title: "П.І.Б.",
     dataIndex: "fullName",
     className: "whitespace-nowrap",
     sortBy: "string"
