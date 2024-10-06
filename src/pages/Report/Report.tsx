@@ -46,7 +46,10 @@ function Report() {
           Згенерувати Звіт
         </Button>
       </div>
-      <Table columns={TABLE_COLUMNS} dataSource={data} />
+      <Table
+        columns={TABLE_COLUMNS}
+        dataSource={data}
+      />
     </div>
   );
 }

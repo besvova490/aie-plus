@@ -17,6 +17,44 @@ module.exports = function createMenu(isDev, win) {
       ],
     },
     isDev && { role: "viewMenu" },
+    {
+      label: "Редагувати",
+      submenu: [
+        {
+          label: 'Скасувати',
+          accelerator: 'CmdOrCtrl+Z',
+          role: 'undo',
+        },
+        {
+          label: 'Повторити',
+          accelerator: 'Shift+CmdOrCtrl+Z',
+          role: 'redo',
+        },
+        {
+          type: 'separator',
+        },
+        {
+          label: 'Вирізати',
+          accelerator: 'CmdOrCtrl+X',
+          role: 'cut',
+        },
+        {
+          label: 'Скопіювати',
+          accelerator: 'CmdOrCtrl+C',
+          role: 'copy',
+        },
+        {
+          label: 'Вставити',
+          accelerator: 'CmdOrCtrl+V',
+          role: 'paste',
+        },
+        {
+          label: 'Вибрати все',
+          accelerator: 'CmdOrCtrl+A',
+          role: 'selectAll',
+        },
+      ]
+    },
     { role: "windowMenu" }
   ].filter(Boolean);
 

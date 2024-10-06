@@ -10,6 +10,7 @@ import { SWR_KEYS } from "@/swr/swrKeys.constants";
 import { ITableColumn } from "@/common/table";
 import { ISingleUser } from "@/types/swr/IUsersList";
 import { TReportData, mapUsersToReport } from "@/lib/generateReport";
+import { cn } from "@/lib/utils";
 
 dayjs.extend(isBetween);
 
@@ -24,7 +25,13 @@ export const TABLE_COLUMNS: ITableColumn<TReportData>[] = [
   { title: (<p className="text-center">ІІІ квартал<br />липень - вересень<br />пройшли підготовку</p>), dataIndex: "thirdQuarter", textAlignment: "center" },
   { title: (<p className="text-center">ІV квартал<br />жовтень - грудень<br />пройшли підготовку</p>), dataIndex: "fourthQuarter", textAlignment: "center" },
   { title: (<p className="text-center">Всього за I - IV квартал<br />пройшли підготовку</p>), dataIndex: "total", textAlignment: "center" }
-];
+].map(item => ({
+  ...item,
+  className: (record) => cn(
+    record?.isAllEmpty && "bg-red-50",
+    record?.orderNumber === "Всього" && "bg-slate-50"
+  )
+})) as ITableColumn<TReportData>[];
 
 export const YEARS_OPTIONS = new Array(10).fill(0).map((_, index) => ({
   label: dayjs()
@@ -44,6 +51,7 @@ export const useReport = ({ year }: { year: number }) => {
     orderNumber: "Всього",
     speciality: "",
     vos: "",
+    isAllEmpty: false,
     today: dataSource.reduce((acc, item) => acc + item.today, 0),
     firstQuarter: dataSource.reduce((acc, item) => acc + item.firstQuarter, 0),
     secondQuarter: dataSource.reduce((acc, item) => acc + item.secondQuarter, 0),

@@ -23,6 +23,7 @@ export type TReportData = {
   thirdQuarter: number;
   fourthQuarter: number;
   total: number;
+  isAllEmpty?: boolean;
 }
 
 export const QUARTERS = {
@@ -52,36 +53,48 @@ const TABLE_COLUMNS = [
   { header: "Всього за I - IV квартал\nпройшли підготовку", key: "total" }
 ];
 
-const isPeriodBetween = (range: { from: string, to: string }, from: dayjs.Dayjs, to: dayjs.Dayjs, year: number) => {
+const isPeriodBetween = (endOfPreparation: string, from: dayjs.Dayjs, to: dayjs.Dayjs, year: number) => {
   const fromYear = from.set("year", year);
   const toYear = to.set("year", year);
 
-  return dayjs(range.from).isBetween(fromYear, toYear) && dayjs(range.to).isBetween(fromYear, toYear);
+  return dayjs(endOfPreparation).isBetween(fromYear, toYear);
 }
 
 export const mapUsersToReport = (data: ISingleUser[], year: number) => {
   const groupedUsers = groupBy(data || [], (record) => `${record.speciality}_&_${record.vos}`);
 
   const dataSource: TReportData[] = Object.entries(groupedUsers).map(([key, users], index) => {
+    const usersToUse = users.filter(item => !item.orderNote.toLowerCase().includes("не завершив") && !item.orderNote.toLowerCase().includes("проходить"));
 
     return {
       orderNumber: index + 1,
       speciality: key.split("_&_")[0],
       vos: key.split("_&_")[1],
-      today: users.filter(item => dayjs(item.period.to).isBefore(dayjs().set("year", year))).length,
-      firstQuarter: users
-        .filter(item => isPeriodBetween(item.period, QUARTERS.first.from, QUARTERS.first.to, year)).length,
-      secondQuarter: users
-        .filter(item => isPeriodBetween(item.period, QUARTERS.second.from, QUARTERS.second.to, year)).length,
-      thirdQuarter: users
-        .filter(item => isPeriodBetween(item.period, QUARTERS.third.from, QUARTERS.third.to, year)).length,
-      fourthQuarter: users
-        .filter(item => isPeriodBetween(item.period, QUARTERS.fourth.from, QUARTERS.fourth.to, year)).length,
-      total: users.filter(item => isPeriodBetween(item.period, QUARTERS.first.from, QUARTERS.fourth.to, year)).length
+      today: users.filter(item => item.orderNote.toLowerCase().includes("проходить")).length,
+      firstQuarter: usersToUse
+        .filter(item => isPeriodBetween(item.period.to, QUARTERS.first.from, QUARTERS.first.to, year)).length,
+      secondQuarter: usersToUse
+        .filter(item => isPeriodBetween(item.period.to, QUARTERS.second.from, QUARTERS.second.to, year)).length,
+      thirdQuarter: usersToUse
+        .filter(item => isPeriodBetween(item.period.to, QUARTERS.third.from, QUARTERS.third.to, year)).length,
+      fourthQuarter: usersToUse
+        .filter(item => isPeriodBetween(item.period.to, QUARTERS.fourth.from, QUARTERS.fourth.to, year)).length,
+      total: usersToUse
+        .filter(item => isPeriodBetween(item.period.to, QUARTERS.first.from, QUARTERS.fourth.to, year)).length
     };
   });
 
-  return dataSource;
+  return dataSource.map(item => ({
+    ...item,
+    isAllEmpty: [
+      item.today,
+      item.firstQuarter,
+      item.secondQuarter,
+      item.thirdQuarter,
+      item.fourthQuarter,
+      item.total
+    ].every(record => !record)
+  }))
 }
 
 const ROW_OFFSET = 4;

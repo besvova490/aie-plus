@@ -3,7 +3,6 @@ import { ChevronUp, ChevronDown, LoaderCircle } from "lucide-react";
 import get from "lodash.get";
 
 // components
-import InfoMessage from "@/components/InfoMessage";
 import { Pagination, IPagination } from "./pagination";
 
 // helpers
@@ -15,15 +14,17 @@ export enum ETableSortDirection {
 }
 
 export interface ITableColumn<T> {
-  className?: string;
+  className?: string | ((record: T | null, column?: ITableColumn<T>) => string);
   dataIndex?: string;
   title: React.ReactNode;
   key?: string;
   headerClassName?: string;
   textAlignment?: "left" | "center" | "right";
-  fixed?: "left" | "right";
   sorter?: ((prev: T, current: T) => number) | boolean;
+  fixed?: "left" | "right";
   render?: (text: React.ReactNode, record: T, index: number) => React.ReactNode;
+  colSpan?: number | ((record: T, index: number) => number);
+  [key: string]: unknown;
 }
 
 export type TSortConfig = {
@@ -33,7 +34,7 @@ export type TSortConfig = {
 
 interface ITable<T> extends React.HTMLAttributes<HTMLTableElement> {
   rowKey?: string;
-  dataSource: T[];
+  dataSource?: T[];
   columns: ITableColumn<T>[];
   pagination?: IPagination;
   defaultSort?: TSortConfig;
@@ -42,6 +43,7 @@ interface ITable<T> extends React.HTMLAttributes<HTMLTableElement> {
   noDataMessage?: React.ReactNode;
   renderNoData?: (() => React.ReactNode) | null;
   onRow?: (record: T, index: number) => { className?: string };
+  className?: string;
 }
 
 function Table<T = Record<string, unknown>>(props: ITable<T>) {
@@ -53,14 +55,14 @@ function Table<T = Record<string, unknown>>(props: ITable<T>) {
     defaultSort = null,
     onSort,
     isLoading,
-    noDataMessage,
+    noDataMessage = "Дані не знайдені",
     renderNoData,
     onRow,
     rowKey,
     ...rest
   } = props;
 
-  const [tableDataSource, setTableDataSource] = useState<T[]>(dataSource);
+  const [tableDataSource, setTableDataSource] = useState<T[]>(dataSource || []);
   const [sortDirection, setSortDirection] = useState<TSortConfig | null>(defaultSort);
 
   const totalPages = pagination && Math.ceil(pagination.total / pagination.pageSize);
@@ -70,22 +72,22 @@ function Table<T = Record<string, unknown>>(props: ITable<T>) {
     if (!column.sorter) {
       return;
     }
-    const sortedData =
-      typeof column.sorter === "function" ? tableDataSource.sort(column.sorter) : tableDataSource;
+    const sortedData = typeof column.sorter === "function"
+      ? tableDataSource.sort(column.sorter)
+      : tableDataSource;
+    
+    const newSortConfig: TSortConfig = { direction: ETableSortDirection.ASC, dataIndex: column.dataIndex as string };
 
-    const newSortConfig: TSortConfig = {
-      direction: ETableSortDirection.ASC,
-      dataIndex: column.dataIndex as string
-    };
 
     if (!sortDirection || !sortDirection.direction) {
       typeof column.sorter === "function" && setTableDataSource(sortedData.reverse());
+
     } else if (sortDirection.direction === ETableSortDirection.ASC) {
       newSortConfig.direction = ETableSortDirection.DESC;
 
       typeof column.sorter === "function" && setTableDataSource(sortedData);
     } else {
-      typeof column.sorter === "function" && setTableDataSource(dataSource);
+      typeof column.sorter === "function" && setTableDataSource(dataSource || []);
 
       newSortConfig.direction = null;
       newSortConfig.dataIndex = null;
@@ -93,139 +95,163 @@ function Table<T = Record<string, unknown>>(props: ITable<T>) {
 
     setSortDirection(newSortConfig);
     onSort && onSort(newSortConfig, column);
-  };
+  }
 
   const checkIsSorted = (column: ITableColumn<T>, direction: ETableSortDirection) => {
-    return (
-      sortDirection &&
-      sortDirection.dataIndex === column.dataIndex &&
-      sortDirection.direction === direction
-    );
-  };
+    return sortDirection && sortDirection.dataIndex === column.dataIndex && sortDirection.direction === direction;
+  }
 
   // effects
   useEffect(() => {
-    setTableDataSource(dataSource);
-  }, [dataSource]);
+    if (typeof dataSource !== "undefined") {
+      setTableDataSource(dataSource);
+    }
+  }, [JSON.stringify(dataSource)]);
+
 
   // render
+  const getColumnsToRender = (record: T, index: number): ITableColumn<T>[] => {
+    let colSpanIndex = 0;
+
+    return columns.map((column, cellIndex) => {
+      const colSpan = typeof column.colSpan === "function"
+        ? column.colSpan(record, index)
+        : column.colSpan;
+
+      if (colSpan) {
+        colSpanIndex = (colSpan - 1) + cellIndex;
+
+        return { ...column, colSpan: colSpanIndex };
+      }
+
+      return colSpanIndex > cellIndex ? null : column;
+    }).filter(Boolean) as ITableColumn<T>[];
+  }
+
   const renderTableRow = (record: T, index: number) => {
     const rowUtils = onRow && onRow(record, index);
 
     const key = rowKey ? get(record, rowKey, `row-${index}`) : `row-${index}`;
 
-    return (
-      <tr
-        className={cn(
-          "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
-          rowUtils?.className
-        )}
-        key={key as string}
-      >
-        {columns.map((column, cellIndex) => (
+    return (<tr
+      className={cn(
+        "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+        rowUtils?.className
+      )}
+      key={key}
+    >
+      {
+        getColumnsToRender(record, index).map((column, cellIndex) => (
           <td
             key={`cell-${index}-${cellIndex}`}
             className={cn(
-              "px-3 py-2 align-middle [&:has([role=checkbox])]:pr-0 bg-white relative after:content-[' '] after:absolute after:top-0 after:left-0 after:w-[1px] after:h-full",
-              column.className,
-              column.fixed === "left" && "sticky left-0 after:bg-slate-100",
-              column.fixed === "right" && "sticky right-0 after:bg-slate-100"
+              "px-3 py-2 align-middle [&:has([role=checkbox])]:pr-0 bg-white",
+              typeof column.className === "function" ? column.className(record, column) : column.className,
+              column.fixed === "left" && "sticky left-0",
+              column.fixed === "right" && "sticky right-0",
             )}
+            colSpan={column.colSpan as number}
           >
-            <div
-              className={cn(
-                "flex items-center gap-4 min-h-[40px]",
-                column.textAlignment === "center" && "justify-center",
-                column.textAlignment === "right" && "justify-end"
-              )}
-            >
-              {column.render
-                ? column.render(
-                  column.dataIndex ? get(record, column.dataIndex) : null,
-                  record,
-                  index
-                )
-                : column.dataIndex
-                  ? get(record, column.dataIndex)
-                  : null}
+            <div className={cn(
+              "flex items-center gap-4 min-h-[40px]",
+              column.textAlignment === "center" && "justify-center",
+              column.textAlignment === "right" && "justify-end",
+            )}>
+              {
+                column.render
+                  ? column.render(column.dataIndex ? get(record, column.dataIndex) : null, record, index)
+                  : column.dataIndex ? get(record, column.dataIndex) : null
+              }
             </div>
           </td>
-        ))}
-      </tr>
-    );
-  };
+        ))
+      }
+    </tr>);
+  }
 
   return (
     <div className="flex flex-col gap-4 relative">
-      <div className="relative border-slate-200 border rounded-lg w-full overflow-x-auto">
-        <table className={cn("caption-bottom text-sm table-auto w-full", className)} {...rest}>
+      <div className="relative w-full border-slate-200 border rounded-lg overflow-x-auto">
+        <table
+          className={cn("caption-bottom text-sm table-auto w-full", className)}
+          {...rest}
+        >
           <thead className="">
             <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-              {columns.map((column, index) => (
-                <th
-                  key={index}
-                  className={cn(
-                    "h-12 px-3 text-left align-middle font-medium bg-slate-300 text-slate-700 [&:has([role=checkbox])]:pr-0 border-b border-slate-200 whitespace-nowrap",
-                    column.headerClassName,
-                    column.fixed === "left" && "sticky left-0 border-r border-slate-200",
-                    column.fixed === "right" && "sticky right-0 border-l border-slate-200"
-                  )}
-                >
-                  <div
-                    className="flex items-center justify-start gap-2 cursor-pointer"
-                    onClick={() => column.sorter && handleSort(column)}
-                  >
-                    <div className="text-base leading-5">{column.title}</div>
-                    {column.sorter && (
-                      <div className="flex flex-col">
-                        <ChevronUp
-                          size={20}
-                          className={cn(
-                            "cursor-pointer transition-all duration-200",
-                            checkIsSorted(column, ETableSortDirection.DESC) && "text-green-500"
-                          )}
-                        />
-                        <ChevronDown
-                          size={20}
-                          className={cn(
-                            "-mt-3 cursor-pointer transition-all duration-200",
-                            checkIsSorted(column, ETableSortDirection.ASC) && "text-green-500"
-                          )}
-                        />
-                      </div>
+              {
+                columns.map((column, index) => (
+                  <th
+                    key={index}
+                    className={cn(
+                      "h-12 px-3 text-left align-middle font-medium text-slate-500 [&:has([role=checkbox])]:pr-0 border-b border-slate-200 whitespace-nowrap bg-white",
+                      typeof column.className === "function" ? column.className(null, column) : column.className,
+                      column.headerClassName,
+                      column.fixed === "left" && "sticky left-0",
+                      column.fixed === "right" && "sticky right-0",
                     )}
-                  </div>
-                </th>
-              ))}
+                  >
+                    <div className="flex items-center justify-start gap-2 cursor-pointer" onClick={() => column.sorter && handleSort(column)}>
+                      <div className="text-xs leading-5">
+                        {column.title}
+                      </div>
+                      {
+                        column.sorter && (
+                          <div className="flex flex-col" data-testid="hdep-table-sort-icon">
+                            <ChevronUp
+                              data-testid="hdep-table-sort-icon-up"
+                              className={cn("w-3 h-3 cursor-pointer transition-all duration-200", checkIsSorted(column, ETableSortDirection.DESC) && "text-primary")}
+                            />
+                            <ChevronDown
+                              data-testid="hdep-table-sort-icon-down"
+                              className={cn("w-3 h-3 -mt-1.5 cursor-pointer transition-all duration-200", checkIsSorted(column, ETableSortDirection.ASC) && "text-primary")}
+                            />
+                          </div>
+                        )
+                      }
+                    </div>
+                  </th>
+                ))
+              }
             </tr>
           </thead>
           <tbody className="[&_tr:last-child]:border-0">
-            {tableDataSource.map((record, index) => renderTableRow(record, index))}
-            {tableDataSource.length === 0 && (
-              <tr>
-                <td colSpan={columns.length} className="p-4 text-center text-slate-400">
-                  {renderNoData ? (
-                    renderNoData()
-                  ) : (
-                    <InfoMessage message={noDataMessage || "No data"} />
-                  )}
-                </td>
-              </tr>
-            )}
+            { tableDataSource.map((record, index) => renderTableRow(record, index)) }
+            {
+              tableDataSource.length === 0 && !isLoading && (
+                <tr>
+                  <td colSpan={columns.length} className="p-4 text-center text-slate-400">
+                    {
+                      renderNoData
+                        ? renderNoData()
+                        : noDataMessage
+                    }
+                  </td>
+                </tr>
+              )
+            }
+            {
+              isLoading && !tableDataSource?.length && (
+                <tr>
+                  <td colSpan={columns.length} className="p-4 text-center text-slate-400">
+                    <div className="flex items-center justify-center w-full min-h-20"/>
+                  </td>
+                </tr>
+              )
+            }
           </tbody>
         </table>
       </div>
-      {pagination && !!totalPages && totalPages > 1 && <Pagination {...pagination} />}
-      <div
-        className={cn(
-          "absolute w-full h-full flex items-center justify-center bg-slate-100 bg-opacity-40 transition-all duration-300",
-          !isLoading && "opacity-0 pointer-events-none"
-        )}
-      >
-        <LoaderCircle className="h-10 w-10 animate-spin-slow text-slate-900" />
+      {
+        !!pagination && !!totalPages && <Pagination {...pagination}/>
+      }
+      <div className={cn(
+        "absolute w-full h-full flex items-center justify-center bg-slate-100 bg-opacity-40 transition-all duration-300",
+        !isLoading && "opacity-0 pointer-events-none"
+      )} data-testid="hdep-table-loader">
+        <LoaderCircle className="h-10 w-10 animate-spin-slow text-slate-900"/>
       </div>
     </div>
   );
 }
 
-export { Table };
+export { Table }

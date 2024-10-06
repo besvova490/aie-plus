@@ -15,6 +15,7 @@ import DangerConfirm from "@/components/dialogs/DangerConfirm";
 import GenerateReportDialog from "@/components/dialogs/GenerateReportDialog";
 
 // helpers
+import { useDebounce } from "@/hooks/useDebounce";
 import { useToast } from "@/hooks/use-toast";
 import { SWR_KEYS } from "@/swr/swrKeys.constants";
 import { ISingleUser } from "@/types/swr/IUsersList";
@@ -56,6 +57,8 @@ function Dashboard() {
 
   const { dataSource, columns, options, mutate, total } = useUsersList({ params });
   const { toast } = useToast();
+
+  const debounceSearch = useDebounce({ timeout: 500 });
 
   // methods
   const handleDeleteUser = (userId: string) => {
@@ -130,7 +133,7 @@ function Dashboard() {
           placeholder="Миколенко Микола Миколайович"
           fullWidth
           value={get(params, "search", "")}
-          onChange={(e) => setParams({ search: e.target.value, page: null })}
+          onChange={(e) => debounceSearch(() => setParams({ search: e.target.value, page: null }))}
         />
         <DatePickerWithRange
           label="Період з/по"
@@ -174,6 +177,9 @@ function Dashboard() {
           }
         ]}
       />
+      <p>
+        <span className="text-slate-500">Загалом:</span> {total}
+      </p>
       <div className="flex items-start justify-start gap-4">
         <Button
           onClick={() => setModalsConfig({ ...modalsConfig, addUser: { open: true, value: null } })}
