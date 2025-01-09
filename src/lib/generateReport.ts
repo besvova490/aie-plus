@@ -27,10 +27,10 @@ export type TReportData = {
 }
 
 export const QUARTERS = {
-  first: { from: dayjs().set("month", 0), to: dayjs().set("month", 3) },
-  second: { from: dayjs().set("month", 3), to: dayjs().set("month", 6) },
-  third: { from: dayjs().set("month", 6), to: dayjs().set("month", 9) },
-  fourth: { from: dayjs().set("month", 9), to: dayjs().set("month", 11) }
+  first: { from: dayjs().set("month", 0).startOf("month"), to: dayjs().set("month", 2).endOf("month") }, //  January - March
+  second: { from: dayjs().set("month", 3).startOf("month"), to: dayjs().set("month", 5).endOf("month") }, //  April - June
+  third: { from: dayjs().set("month", 6).startOf("month"), to: dayjs().set("month", 8).endOf("month") }, //  July - September
+  fourth: { from: dayjs().set("month", 9).startOf("month"), to: dayjs().set("month", 11).endOf("month") } //  October - December
 } as Record<string, TQuarter>;
 
 const BORDER_STYLE: exceljs.Border = { style: "medium", color: { argb: "000000" } };
@@ -54,10 +54,10 @@ const TABLE_COLUMNS = [
 ];
 
 const isPeriodBetween = (endOfPreparation: string, from: dayjs.Dayjs, to: dayjs.Dayjs, year: number) => {
-  const fromYear = from.set("year", year);
-  const toYear = to.set("year", year);
+  const fromDate = from.set("year", year);
+  const toDate = to.set("year", year);
 
-  return dayjs(endOfPreparation).isBetween(fromYear, toYear);
+  return dayjs(endOfPreparation).isBetween(fromDate, toDate);
 }
 
 export const mapUsersToReport = (data: ISingleUser[], year: number) => {
